@@ -38,6 +38,9 @@ import com.divinesoft.boynas.model.ConfigEntry;
 import com.divinesoft.boynas.persistence.StoreUtil;
 
 public class Boynas {
+	Importer importer;
+	Exporter exporter;
+	
 	@SuppressWarnings("unchecked")
 	private void getAllConfigEntries(){
 		List<ConfigEntry> configEntries = StoreUtil.getStore().find("find configentry");
@@ -257,6 +260,7 @@ public class Boynas {
 		try {
 			CommandLine cmd = parser.parse(options, args);
 			
+			//Inject instance
 			Boynas boynas = new Boynas();
 			
 			if(cmd.hasOption("list")){
