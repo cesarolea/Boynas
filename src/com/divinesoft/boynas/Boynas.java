@@ -16,6 +16,7 @@ package com.divinesoft.boynas;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 
 import com.divinesoft.boynas.exporters.Exporter;
 import com.divinesoft.boynas.exporters.TemplateExporter;
@@ -257,18 +264,32 @@ public class Boynas {
 		options.addOption(version);
 		
 		CommandLineParser parser = new GnuParser();
+		
+		//The main Boynas object
+		Boynas boynas;
+		
+		//Start dealing with application context
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		BeanDefinition beanDefinition = BeanDefinitionBuilder.rootBeanDefinition(
+				Arrays.class, "asList")
+				.addConstructorArgValue(args).getBeanDefinition();
+		beanFactory.registerBeanDefinition("args", beanDefinition);
+		GenericApplicationContext cmdArgCxt = new GenericApplicationContext(beanFactory);
+		cmdArgCxt.refresh();
+		
+		XmlBeanFactory appContext = new XmlBeanFactory(new ClassPathResource("applicationContext.xml"), cmdArgCxt);
+		
 		try {
 			CommandLine cmd = parser.parse(options, args);
 			
-			//Inject instance
-			Boynas boynas = new Boynas();
-			
 			if(cmd.hasOption("list")){
-				boynas.getAllConfigEntries();
+				boynas = (Boynas)appContext.getBean("boynasList");
 			}else if(cmd.hasOption("clean")){
+				boynas = (Boynas)appContext.getBean("boynasList");
 				boynas.clean();
 			}else if(cmd.hasOption("importCSV")){
-				String path = cmd.getOptionValue("importCSV");
+				boynas = (Boynas)appContext.getBean("bynImportCSV");
+				cmd.getOptionValue("importCSV");
 				boynas.importCSV(path);
 			}else if(cmd.hasOption("exportXML")){
 				boynas.exportXML();

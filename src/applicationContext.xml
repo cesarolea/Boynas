@@ -36,5 +36,11 @@
 	
 	<!-- Exporters -->
 	<bean id="XMLExporter" class="com.divinesoft.boynas.exporters.XMLExporter" />
-	<bean id="TemplateExporter" class="com.divinesoft.boynas.exporters.TemplateExporter" />
+	<bean id="TemplateExporter" class="com.divinesoft.boynas.exporters.TemplateExporter">
+		<property name="velocityEngine">
+			<ref bean="velocityEngine" />
+		</property>
+	</bean>
+	
+	<bean id="velocityEngine" class="org.apache.velocity.app.VelocityEngine" />
 </beans>

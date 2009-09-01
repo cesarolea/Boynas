@@ -6,22 +6,27 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.divinesoft.boynas.model.ConfigEntry;
 
 public class CSVImporter implements Importer{
-	private Map<String, String> params = new HashMap<String, String>();
+	private String filePath;
 	
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
 	@Override
 	public List<ConfigEntry> getList() {
-		String path = params.get("path");
 		//CSV file is 4 fields per line: mac,extension,password,lines
 		List<ConfigEntry> entries = new ArrayList<ConfigEntry>();
 		//Read the file
-		File file = new File(path);
+		File file = new File(filePath);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			
@@ -50,10 +55,5 @@ public class CSVImporter implements Importer{
 			ioe.printStackTrace();
 			return null;
 		}
-	}
-
-	@Override
-	public void setup(Map<String, String> params) {
-		this.params = params;
 	}
 }

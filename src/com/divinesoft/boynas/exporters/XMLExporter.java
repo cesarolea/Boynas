@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -100,8 +99,4 @@ public class XMLExporter implements Exporter{
 		
 		return extDoc;
 	}
-	
-	@Override
-	public void setup(Map<String, String> params) {}
-	
 }
