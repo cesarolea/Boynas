@@ -38,6 +38,10 @@ public class Boynas {
 	Importer importer;
 	Exporter exporter;
 	
+	//Command Line options
+	public static String filePath;
+	public static String templatePath;
+	
 	@SuppressWarnings("unchecked")
 	private void getAllConfigEntries(){
 		List<ConfigEntry> configEntries = StoreUtil.getStore().find("find configentry");
@@ -51,7 +55,7 @@ public class Boynas {
 			System.out.println("-- No Config Entries Found! --");
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void clean(){
 		List<ConfigEntry> configEntries = StoreUtil.getStore().find("find configentry");
@@ -228,8 +232,8 @@ public class Boynas {
 				boynas = (Boynas)appContext.getBean("boynasList");
 				boynas.clean();
 			}else if(cmd.hasOption("importCSV")){
-				boynas = (Boynas)appContext.getBean("bynImportCSV", 
-						new Object[]{cmd.getOptionValue("importCSV")});
+				Boynas.filePath = cmd.getOptionValue("importCSV");
+				boynas = (Boynas)appContext.getBean("bynImportCSV");
 				boynas.importCSV();
 			}else if(cmd.hasOption("exportXML")){
 				boynas = (Boynas)appContext.getBean("bynExportXML");
@@ -256,7 +260,10 @@ public class Boynas {
 					formatter.printHelp("boynas", options);
 				}
 				
-				boynas = (Boynas)appContext.getBean("bynQuickExport", paths);
+				Boynas.filePath = paths[0];
+				Boynas.templatePath = paths[1];
+				
+				boynas = (Boynas)appContext.getBean("bynQuickExport");
 				
 				boynas.quickExport();
 			}
@@ -271,5 +278,30 @@ public class Boynas {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("boynas", options);
 		}
+	}
+	
+	/*Getters and Setters*/
+	public Importer getImporter() {
+		return importer;
+	}
+
+	public void setImporter(Importer importer) {
+		this.importer = importer;
+	}
+
+	public Exporter getExporter() {
+		return exporter;
+	}
+
+	public void setExporter(Exporter exporter) {
+		this.exporter = exporter;
+	}
+
+	public static String getFilePath() {
+		return filePath;
+	}
+
+	public static void setFilePath(String filePath) {
+		Boynas.filePath = filePath;
 	}
 }

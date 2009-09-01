@@ -14,14 +14,11 @@ import org.apache.velocity.app.VelocityEngine;
 import com.divinesoft.boynas.model.ConfigEntry;
 
 public class TemplateExporter implements Exporter{
-	private String extTemplatePath, macTemplatePath;
+	private String templatePath, extTemplatePath, macTemplatePath;
 	private VelocityEngine velocityEngine = new VelocityEngine();
 	private Template extTemplate, macTemplate;
 	
-	public TemplateExporter(String extTemplatePath, String macTemplatePath){
-		this.extTemplatePath = extTemplatePath;
-		this.macTemplatePath = macTemplatePath;
-		
+	public TemplateExporter(){
 		setupVelocityEngine();
 	}
 	
@@ -30,8 +27,10 @@ public class TemplateExporter implements Exporter{
 			velocityEngine.init();
 			
 			//Setup the templates
-			extTemplate = velocityEngine.getTemplate(extTemplatePath);
-			macTemplate = velocityEngine.getTemplate(macTemplatePath);
+			extTemplate = velocityEngine.getTemplate(templatePath +
+					File.separator + extTemplatePath);
+			macTemplate = velocityEngine.getTemplate(templatePath +
+					File.separator + macTemplatePath);
 			
 		} catch (Exception e) {
 			System.err.println("Error initializing the Velocity engine!");
@@ -42,6 +41,38 @@ public class TemplateExporter implements Exporter{
 		}
 	}
 	
+	public String getTemplatePath() {
+		return templatePath;
+	}
+
+	public void setTemplatePath(String templatePath) {
+		this.templatePath = templatePath;
+	}
+
+	public VelocityEngine getVelocityEngine() {
+		return velocityEngine;
+	}
+
+	public void setVelocityEngine(VelocityEngine velocityEngine) {
+		this.velocityEngine = velocityEngine;
+	}
+
+	public Template getExtTemplate() {
+		return extTemplate;
+	}
+
+	public void setExtTemplate(Template extTemplate) {
+		this.extTemplate = extTemplate;
+	}
+
+	public Template getMacTemplate() {
+		return macTemplate;
+	}
+
+	public void setMacTemplate(Template macTemplate) {
+		this.macTemplate = macTemplate;
+	}
+
 	@Override
 	public void writeDocument(List<ConfigEntry> entries) throws IOException{	
 		
