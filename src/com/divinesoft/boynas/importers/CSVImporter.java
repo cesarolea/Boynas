@@ -20,6 +20,10 @@ public class CSVImporter implements Importer{
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 	}
+	
+	public CSVImporter(String filePath){
+		this.filePath = filePath;
+	}
 
 	@Override
 	public List<ConfigEntry> getList() {

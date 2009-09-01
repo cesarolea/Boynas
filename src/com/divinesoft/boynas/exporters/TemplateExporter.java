@@ -18,6 +18,13 @@ public class TemplateExporter implements Exporter{
 	private VelocityEngine velocityEngine = new VelocityEngine();
 	private Template extTemplate, macTemplate;
 	
+	public TemplateExporter(String extTemplatePath, String macTemplatePath){
+		this.extTemplatePath = extTemplatePath;
+		this.macTemplatePath = macTemplatePath;
+		
+		setupVelocityEngine();
+	}
+	
 	private void setupVelocityEngine(){
 		try {
 			velocityEngine.init();
@@ -37,9 +44,6 @@ public class TemplateExporter implements Exporter{
 	
 	@Override
 	public void writeDocument(List<ConfigEntry> entries) throws IOException{	
-		if(velocityEngine == null){
-			setupVelocityEngine();
-		}
 		
 		VelocityContext context = new VelocityContext();
 
