@@ -46,13 +46,22 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 	<!-- Exporters -->
 	<bean id="XMLExporter" class="com.divinesoft.boynas.exporters.XMLExporter" />
 	
-	<bean id="TemplateExporter" class="com.divinesoft.boynas.exporters.TemplateExporter">
+	<bean id="TemplateExporter" class="com.divinesoft.boynas.exporters.TemplateExporter" 
+		init-method="initVelocityEngine" >
 		<property name="velocityEngine">
 			<ref bean="velocityEngine" />
 		</property>
 		
 		<property name="templatePath">
 			<util:constant static-field="com.divinesoft.boynas.Boynas.templatePath" />
+		</property>
+		
+		<property name="extTemplatePath">
+			<value>ext-template.cfg</value>
+		</property>
+		
+		<property name="macTemplatePath">
+			<value>mac-template.cfg</value>
 		</property>
 	</bean>
 	

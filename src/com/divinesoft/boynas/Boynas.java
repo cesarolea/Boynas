@@ -187,9 +187,8 @@ public class Boynas {
 							.create("exportXML");
 		
 		Option exportTemplate = OptionBuilder
-							.withArgName("ext template,mac template")
-							.hasArgs(2)
-							.withValueSeparator(',')
+							.withArgName("templates folder")
+							.hasArgs()
 							.withDescription("Export all config entries from a set of template files")
 							.create("exportTemplate");
 		
@@ -201,7 +200,7 @@ public class Boynas {
 							.withArgName("import file,templates folder")
 							.withDescription("Use a one-shot template based config generator")
 							.hasArgs(2)
-							.withValueSeparator(',')
+							.withValueSeparator(' ')
 							.create("quickExport");
 		
 		//Add options
@@ -242,15 +241,8 @@ public class Boynas {
 				boynas = (Boynas)appContext.getBean("boynasList");
 				boynas.printVersion();
 			}else if(cmd.hasOption("exportTemplate")){
-				String[] paths = cmd.getOptionValues("exportTemplate");
-				
-				if(paths.length < 2){
-					HelpFormatter formatter = new HelpFormatter();
-					formatter.printHelp("boynas", options);		
-				}
-				
-				boynas = (Boynas)appContext.getBean("bynExportTemplate", paths);
-				
+				Boynas.templatePath = cmd.getOptionValue("exportTemplate");
+				boynas = (Boynas)appContext.getBean("bynExportTemplate");
 				boynas.exportTemplate();
 			}else if(cmd.hasOption("quickExport")){
 				String[] paths = cmd.getOptionValues("quickExport");
@@ -262,9 +254,7 @@ public class Boynas {
 				
 				Boynas.filePath = paths[0];
 				Boynas.templatePath = paths[1];
-				
 				boynas = (Boynas)appContext.getBean("bynQuickExport");
-				
 				boynas.quickExport();
 			}
 			

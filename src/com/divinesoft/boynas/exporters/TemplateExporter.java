@@ -15,14 +15,10 @@ import com.divinesoft.boynas.model.ConfigEntry;
 
 public class TemplateExporter implements Exporter{
 	private String templatePath, extTemplatePath, macTemplatePath;
-	private VelocityEngine velocityEngine = new VelocityEngine();
+	private VelocityEngine velocityEngine;
 	private Template extTemplate, macTemplate;
 	
-	public TemplateExporter(){
-		setupVelocityEngine();
-	}
-	
-	private void setupVelocityEngine(){
+	public void initVelocityEngine(){
 		try {
 			velocityEngine.init();
 			
@@ -39,38 +35,6 @@ public class TemplateExporter implements Exporter{
 			System.err.println("macTemplatePath\t"+macTemplatePath);
 			e.printStackTrace();
 		}
-	}
-	
-	public String getTemplatePath() {
-		return templatePath;
-	}
-
-	public void setTemplatePath(String templatePath) {
-		this.templatePath = templatePath;
-	}
-
-	public VelocityEngine getVelocityEngine() {
-		return velocityEngine;
-	}
-
-	public void setVelocityEngine(VelocityEngine velocityEngine) {
-		this.velocityEngine = velocityEngine;
-	}
-
-	public Template getExtTemplate() {
-		return extTemplate;
-	}
-
-	public void setExtTemplate(Template extTemplate) {
-		this.extTemplate = extTemplate;
-	}
-
-	public Template getMacTemplate() {
-		return macTemplate;
-	}
-
-	public void setMacTemplate(Template macTemplate) {
-		this.macTemplate = macTemplate;
 	}
 
 	@Override
@@ -125,6 +89,38 @@ public class TemplateExporter implements Exporter{
 
 	public void setMacTemplatePath(String macTemplatePath) {
 		this.macTemplatePath = macTemplatePath;
+	}
+	
+	public String getTemplatePath() {
+		return templatePath;
+	}
+
+	public void setTemplatePath(String templatePath) {
+		this.templatePath = templatePath;
+	}
+
+	public VelocityEngine getVelocityEngine() {
+		return velocityEngine;
+	}
+
+	public void setVelocityEngine(VelocityEngine velocityEngine) {
+		this.velocityEngine = velocityEngine;
+	}
+
+	public Template getExtTemplate() {
+		return extTemplate;
+	}
+
+	public void setExtTemplate(Template extTemplate) {
+		this.extTemplate = extTemplate;
+	}
+
+	public Template getMacTemplate() {
+		return macTemplate;
+	}
+
+	public void setMacTemplate(Template macTemplate) {
+		this.macTemplate = macTemplate;
 	}
 	
 }
