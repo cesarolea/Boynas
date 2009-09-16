@@ -1,5 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-
+	<bean id="boynasList" class="com.divinesoft.boynas.Boynas" />
+	
+	<bean id="bynImportCSV" class="com.divinesoft.boynas.Boynas">
+		<property name="importer">
+			<ref bean="CSVImporter"/>
+		</property>
+	</bean>
+	
+	<bean id="bynExportXML" class="com.divinesoft.boynas.Boynas">
+		<property name="exporter">
+			<ref bean="XMLExporter" />
+		</property>
+	</bean>
+	
+	<bean id="bynExportTemplate" class="com.divinesoft.boynas.Boynas">
+		<property name="exporter">
+			<ref bean="TemplateExporter" />
+		</property>
+	</bean>
+	
+	<bean id="bynQuickExport" class="com.divinesoft.boynas.Boynas">
+		<property name="importer">
+			<ref bean="CSVImporter" />
+		</property>
+		
+		<property name="exporter">
+			<ref bean="TemplateExporter" />
+		</property>
+	</bean>
+	
+	<!-- Importer -->
+	<bean id="CSVImporter" class="com.divinesoft.boynas.importers.CSVImporter" />
+	
+	<!-- Exporters -->
+	<bean id="XMLExporter" class="com.divinesoft.boynas.exporters.XMLExporter" />
+	<bean id="TemplateExporter" class="com.divinesoft.boynas.exporters.TemplateExporter">
+		<property name="velocityEngine">
+			<ref bean="velocityEngine" />
+		</property>
+	</bean>
+	
+	<bean id="velocityEngine" class="org.apache.velocity.app.VelocityEngine" />
 </beans>

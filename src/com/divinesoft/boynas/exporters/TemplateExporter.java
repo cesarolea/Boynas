@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -16,20 +15,23 @@ import com.divinesoft.boynas.model.ConfigEntry;
 
 public class TemplateExporter implements Exporter{
 	private String extTemplatePath, macTemplatePath;
-	private VelocityEngine ve = new VelocityEngine();
+	private VelocityEngine velocityEngine = new VelocityEngine();
 	private Template extTemplate, macTemplate;
 	
-	@Override
-	public void setup(Map<String,String> params){
-		extTemplatePath = params.get("extTemplatePath");
-		macTemplatePath = params.get("macTemplatePath");
+	public TemplateExporter(String extTemplatePath, String macTemplatePath){
+		this.extTemplatePath = extTemplatePath;
+		this.macTemplatePath = macTemplatePath;
 		
+		setupVelocityEngine();
+	}
+	
+	private void setupVelocityEngine(){
 		try {
-			ve.init();
+			velocityEngine.init();
 			
 			//Setup the templates
-			extTemplate = ve.getTemplate(extTemplatePath);
-			macTemplate = ve.getTemplate(macTemplatePath);
+			extTemplate = velocityEngine.getTemplate(extTemplatePath);
+			macTemplate = velocityEngine.getTemplate(macTemplatePath);
 			
 		} catch (Exception e) {
 			System.err.println("Error initializing the Velocity engine!");
@@ -38,11 +40,10 @@ public class TemplateExporter implements Exporter{
 			System.err.println("macTemplatePath\t"+macTemplatePath);
 			e.printStackTrace();
 		}
-		
 	}
 	
 	@Override
-	public void writeDocument(List<ConfigEntry> entries) throws IOException{
+	public void writeDocument(List<ConfigEntry> entries) throws IOException{	
 		VelocityContext context = new VelocityContext();
 
 		for(ConfigEntry c : entries){
@@ -78,4 +79,19 @@ public class TemplateExporter implements Exporter{
 		bw.close();
 	}
 	
+	public String getExtTemplatePath() {
+		return extTemplatePath;
+	}
+
+	public void setExtTemplatePath(String extTemplatePath) {
+		this.extTemplatePath = extTemplatePath;
+	}
+
+	public String getMacTemplatePath() {
+		return macTemplatePath;
+	}
+
+	public void setMacTemplatePath(String macTemplatePath) {
+		this.macTemplatePath = macTemplatePath;
+	}
 }

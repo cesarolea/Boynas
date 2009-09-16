@@ -14,11 +14,8 @@
  */
 package com.divinesoft.boynas;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -29,15 +26,21 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.core.io.ClassPathResource;
+
 import com.divinesoft.boynas.exporters.Exporter;
-import com.divinesoft.boynas.exporters.TemplateExporter;
 import com.divinesoft.boynas.exporters.XMLExporter;
-import com.divinesoft.boynas.importers.CSVImporter;
+
 import com.divinesoft.boynas.importers.Importer;
 import com.divinesoft.boynas.model.ConfigEntry;
 import com.divinesoft.boynas.persistence.StoreUtil;
 
 public class Boynas {
+
+	Importer importer;
+	Exporter exporter;
+	
 	@SuppressWarnings("unchecked")
 	private void getAllConfigEntries(){
 		List<ConfigEntry> configEntries = StoreUtil.getStore().find("find configentry");
@@ -68,20 +71,15 @@ public class Boynas {
 		}
 	}
 	
-	private void importCSV(String path){
-		Importer importer = new CSVImporter();
-		
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("path", path);
-		
+	private void importCSV(){
 		//Get config entries
-		importer.setup(params);
 		List<ConfigEntry> entries = importer.getList();
 		
 		if(entries == null){
 			System.out.println("An error occurred when trying to import from CSV");
 			System.out.println("Please verify the following:");
-			System.out.println("* File "+path+ " exists.");
+
+			System.out.println("* The file to be imported exists.");
 			System.out.println("* It's a CSV with no more, no less than 4 fields.");
 			System.out.println("* For example: fieldA,fieldB,fieldC,fieldD");
 			System.out.println("* The system can read the specified file.");
@@ -118,17 +116,7 @@ public class Boynas {
 		System.out.println("-- End Export --");
  	}
 	
-	private void exportTemplate(String[] paths){
-		Exporter exporter = new TemplateExporter();
-		Map<String, String> settings = new HashMap<String, String>();
-		settings.put("extTemplatePath", paths[0]);
-		settings.put("macTemplatePath", paths[1]);
-		exporter.setup(settings);
-		
-		if(exporter == null){
-			return;
-		}
-		
+	private void exportTemplate(){
 		System.out.println("-- Start Export --");
 		List<ConfigEntry> entries = StoreUtil.getStore().find("find configentry");
 		
@@ -146,37 +134,9 @@ public class Boynas {
 		System.out.println("-- End Export --");
 	}
 	
-	private void quickExport(String[] paths){
+	private void quickExport(){
 		//Build the config entries
-		Importer importer = new CSVImporter();
-		Map<String, String> params = new HashMap<String, String>();
-		
-		if(!isValidFile(paths[0])){
-			return;
-		}
-		
-		params.put("path", paths[0]);
-		importer.setup(params);
 		List<ConfigEntry> entries = importer.getList();
-		
-		Exporter exporter = new TemplateExporter();
-		Map<String, String> settings = new HashMap<String, String>();
-		
-		//Template folder
-		if(!isValidPath(paths[1])){
-			System.err.println("-- The templates folder is not valid --");
-			return;
-		}
-		
-		String templateFolderPath = paths[1];
-
-		settings.put("extTemplatePath", templateFolderPath+"/ext-template.cfg");
-		settings.put("macTemplatePath", templateFolderPath+"/mac-template.cfg");
-		exporter.setup(settings);
-		
-		if(exporter == null){
-			return;
-		}
 		
 		if(entries.size() <= 0){
 			System.out.println("-- Couldn't find any valid entries in the input file! --");
@@ -254,21 +214,32 @@ public class Boynas {
 		options.addOption(version);
 		
 		CommandLineParser parser = new GnuParser();
+		
+		//The main Boynas object
+		Boynas boynas;
+		
+		//Start dealing with application context
+		XmlBeanFactory appContext = new XmlBeanFactory(
+				new ClassPathResource("applicationContext.xml"));
+		
 		try {
 			CommandLine cmd = parser.parse(options, args);
 			
-			Boynas boynas = new Boynas();
-			
 			if(cmd.hasOption("list")){
+				boynas = (Boynas)appContext.getBean("boynasList");
 				boynas.getAllConfigEntries();
 			}else if(cmd.hasOption("clean")){
+				boynas = (Boynas)appContext.getBean("boynasList");
 				boynas.clean();
 			}else if(cmd.hasOption("importCSV")){
-				String path = cmd.getOptionValue("importCSV");
-				boynas.importCSV(path);
+				boynas = (Boynas)appContext.getBean("bynImportCSV", 
+						new Object[]{cmd.getOptionValue("importCSV")});
+				boynas.importCSV();
 			}else if(cmd.hasOption("exportXML")){
+				boynas = (Boynas)appContext.getBean("bynExportXML");
 				boynas.exportXML();
 			}else if(cmd.hasOption("version")){
+				boynas = (Boynas)appContext.getBean("boynasList");
 				boynas.printVersion();
 			}else if(cmd.hasOption("exportTemplate")){
 				String[] paths = cmd.getOptionValues("exportTemplate");
@@ -278,14 +249,20 @@ public class Boynas {
 					formatter.printHelp("boynas", options);		
 				}
 				
-				boynas.exportTemplate(paths);
+				boynas = (Boynas)appContext.getBean("bynExportTemplate", paths);
+				
+				boynas.exportTemplate();
 			}else if(cmd.hasOption("quickExport")){
 				String[] paths = cmd.getOptionValues("quickExport");
+				
 				if(paths.length < 2){
 					HelpFormatter formatter = new HelpFormatter();
 					formatter.printHelp("boynas", options);
 				}
-				boynas.quickExport(paths);
+				
+				boynas = (Boynas)appContext.getBean("bynQuickExport", paths);
+				
+				boynas.quickExport();
 			}
 			
 			else{
@@ -298,21 +275,5 @@ public class Boynas {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("boynas", options);
 		}
-	}
-	
-	private boolean isValidFile(String path){
-		File f = new File(path);
-		if(f.isFile() && f.exists()){
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean isValidPath(String path){
-		File f = new File(path);
-		if(f.isDirectory() && f.exists()){
-			return true;
-		}
-		return false;
 	}
 }
