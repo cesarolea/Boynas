@@ -3,3 +3,4 @@ db/*
 boynas*.jar
 *~
 *.class
+*.log

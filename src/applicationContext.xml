@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
 	<bean id="boynasList" class="com.divinesoft.boynas.Boynas" />
 	
 	<bean id="bynImportCSV" class="com.divinesoft.boynas.Boynas">
@@ -32,13 +37,31 @@
 	</bean>
 	
 	<!-- Importer -->
-	<bean id="CSVImporter" class="com.divinesoft.boynas.importers.CSVImporter" />
+	<bean id="CSVImporter" class="com.divinesoft.boynas.importers.CSVImporter">
+		<property name="filePath">
+			<util:constant static-field="com.divinesoft.boynas.Boynas.filePath"/>
+		</property>
+	</bean>
 	
 	<!-- Exporters -->
 	<bean id="XMLExporter" class="com.divinesoft.boynas.exporters.XMLExporter" />
-	<bean id="TemplateExporter" class="com.divinesoft.boynas.exporters.TemplateExporter">
+	
+	<bean id="TemplateExporter" class="com.divinesoft.boynas.exporters.TemplateExporter" 
+		init-method="initVelocityEngine" >
 		<property name="velocityEngine">
 			<ref bean="velocityEngine" />
+		</property>
+		
+		<property name="templatePath">
+			<util:constant static-field="com.divinesoft.boynas.Boynas.templatePath" />
+		</property>
+		
+		<property name="extTemplatePath">
+			<value>ext-template.cfg</value>
+		</property>
+		
+		<property name="macTemplatePath">
+			<value>mac-template.cfg</value>
 		</property>
 	</bean>
 	

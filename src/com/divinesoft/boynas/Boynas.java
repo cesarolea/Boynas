@@ -41,6 +41,10 @@ public class Boynas {
 	Importer importer;
 	Exporter exporter;
 	
+	//Command Line options
+	public static String filePath;
+	public static String templatePath;
+	
 	@SuppressWarnings("unchecked")
 	private void getAllConfigEntries(){
 		List<ConfigEntry> configEntries = StoreUtil.getStore().find("find configentry");
@@ -54,7 +58,7 @@ public class Boynas {
 			System.out.println("-- No Config Entries Found! --");
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void clean(){
 		List<ConfigEntry> configEntries = StoreUtil.getStore().find("find configentry");
@@ -187,9 +191,8 @@ public class Boynas {
 							.create("exportXML");
 		
 		Option exportTemplate = OptionBuilder
-							.withArgName("ext template,mac template")
-							.hasArgs(2)
-							.withValueSeparator(',')
+							.withArgName("templates folder")
+							.hasArgs()
 							.withDescription("Export all config entries from a set of template files")
 							.create("exportTemplate");
 		
@@ -201,7 +204,7 @@ public class Boynas {
 							.withArgName("import file,templates folder")
 							.withDescription("Use a one-shot template based config generator")
 							.hasArgs(2)
-							.withValueSeparator(',')
+							.withValueSeparator(' ')
 							.create("quickExport");
 		
 		//Add options
@@ -232,8 +235,8 @@ public class Boynas {
 				boynas = (Boynas)appContext.getBean("boynasList");
 				boynas.clean();
 			}else if(cmd.hasOption("importCSV")){
-				boynas = (Boynas)appContext.getBean("bynImportCSV", 
-						new Object[]{cmd.getOptionValue("importCSV")});
+				Boynas.filePath = cmd.getOptionValue("importCSV");
+				boynas = (Boynas)appContext.getBean("bynImportCSV");
 				boynas.importCSV();
 			}else if(cmd.hasOption("exportXML")){
 				boynas = (Boynas)appContext.getBean("bynExportXML");
@@ -242,15 +245,8 @@ public class Boynas {
 				boynas = (Boynas)appContext.getBean("boynasList");
 				boynas.printVersion();
 			}else if(cmd.hasOption("exportTemplate")){
-				String[] paths = cmd.getOptionValues("exportTemplate");
-				
-				if(paths.length < 2){
-					HelpFormatter formatter = new HelpFormatter();
-					formatter.printHelp("boynas", options);		
-				}
-				
-				boynas = (Boynas)appContext.getBean("bynExportTemplate", paths);
-				
+				Boynas.templatePath = cmd.getOptionValue("exportTemplate");
+				boynas = (Boynas)appContext.getBean("bynExportTemplate");
 				boynas.exportTemplate();
 			}else if(cmd.hasOption("quickExport")){
 				String[] paths = cmd.getOptionValues("quickExport");
@@ -260,8 +256,9 @@ public class Boynas {
 					formatter.printHelp("boynas", options);
 				}
 				
-				boynas = (Boynas)appContext.getBean("bynQuickExport", paths);
-				
+				Boynas.filePath = paths[0];
+				Boynas.templatePath = paths[1];
+				boynas = (Boynas)appContext.getBean("bynQuickExport");
 				boynas.quickExport();
 			}
 			
@@ -275,5 +272,30 @@ public class Boynas {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("boynas", options);
 		}
+	}
+	
+	/*Getters and Setters*/
+	public Importer getImporter() {
+		return importer;
+	}
+
+	public void setImporter(Importer importer) {
+		this.importer = importer;
+	}
+
+	public Exporter getExporter() {
+		return exporter;
+	}
+
+	public void setExporter(Exporter exporter) {
+		this.exporter = exporter;
+	}
+
+	public static String getFilePath() {
+		return filePath;
+	}
+
+	public static void setFilePath(String filePath) {
+		Boynas.filePath = filePath;
 	}
 }
