@@ -1,0 +1,73 @@
+<project name="Boynas" default="make_jar" basedir=".">
+    <property name="build.dir" value="bin/" />
+    <property name="dist.dir" value="dist/" />
+    <property name="temp.dir" value="tmp/" />
+    <property name="lib.dir" value="lib/" />    
+    <property name="src.dir" value="src/" />       
+    
+    <path id="class.path">
+        <fileset dir="lib">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+    
+    <target name="init">
+        <property name="project_name" value="Boynas" />
+        <property name="jar" value="${dist.dir}/${project_name}.jar" />
+        <property name="mainclass" value="com.divinesoft.boynas.Boynas" />
+        <tstamp />
+    </target>
+    
+    <target name="create_dirs" depends="init">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${dist.dir}" />
+        <mkdir dir="${temp.dir}" />
+    </target>
+    
+    <target name="clean">
+        <delete dir="${build.dir}" />
+        <delete dir="${dist.dir}" />
+        <delete dir="${temp.dir}" />
+    </target>
+    
+    <target name="compile" depends="clean, create_dirs">
+        <javac destdir="${build.dir}" source="1.6">
+            <src path="src" />
+            <exclude name="**/_*.java" />
+            <classpath refid="class.path" />
+        </javac>
+        <copy todir="${dist.dir}">
+            <fileset dir=".">
+                <include name="test.csv" />
+            </fileset>
+            <dirset dir=".">
+                <include name="templates/" />
+            </dirset>
+        </copy>
+    </target>
+    
+    <target name="make_jar" depends="compile, unjar_dependencies">
+        <jar    basedir="${build.dir}"
+                destfile="${dist.dir}/${project_name}.jar">
+            <manifest>
+                <attribute name="Main-Class" value="${mainclass}" />
+            </manifest>
+            <fileset dir="${build.dir}">
+                <include name="**/*.class" />
+            </fileset>
+            <fileset dir="${src.dir}">
+                <include name="applicationContext.xml" />
+                <include name="log4j.properties" />
+            </fileset>
+        </jar>
+        <delete dir="${temp.dir}" />
+    </target>
+    
+    <target name="unjar_dependencies" depends="clean">
+        <unzip dest="${build.dir}">
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar" />
+            </fileset>    
+        </unzip>
+    </target>
+</project>
