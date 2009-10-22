@@ -4,3 +4,4 @@ boynas*.jar
 *~
 *.class
 *.log
+dist/*
